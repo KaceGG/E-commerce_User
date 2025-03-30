@@ -1,3 +1,5 @@
+import 'package:ecommerce_user/providers/auth_provider.dart';
+import 'package:ecommerce_user/providers/cart_provider.dart';
 import 'package:ecommerce_user/providers/category_provider.dart';
 import 'package:ecommerce_user/providers/product_provider.dart';
 import 'package:ecommerce_user/routes/app_router.dart';
@@ -13,6 +15,8 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (context) => CategoryProvider()),
         ChangeNotifierProvider(create: (context) => ProductProvider()),
+        ChangeNotifierProvider(create: (context) => CartProvider()),
+        ChangeNotifierProvider(create: (context) => AuthProvider()),
       ],
       child: MaterialApp.router(
         routerConfig: AppRouter.router,
