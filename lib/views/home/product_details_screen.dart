@@ -1,4 +1,7 @@
 import 'package:ecommerce_user/models/category_model.dart';
+import 'package:ecommerce_user/providers/auth_provider.dart';
+import 'package:ecommerce_user/providers/cart_provider.dart';
+import 'package:ecommerce_user/views/auth/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -184,6 +187,87 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     },
                   ),
                   const SizedBox(height: 16),
+                  //Add to cart
+                  Consumer<AuthProvider>(
+                    builder: (context, authProvider, child) {
+                      return Consumer<CartProvider>(
+                        builder: (context, cartProvider, child) {
+                          return Center(
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                if (!authProvider.isLoggedIn) {
+                                  // Chưa đăng nhập, điều hướng đến màn hình đăng nhập
+                                  final result = await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const LoginScreen()),
+                                  );
+                                  // Nếu đăng nhập thành công, tiếp tục thêm vào giỏ hàng
+                                  if (result != null &&
+                                      authProvider.isLoggedIn) {
+                                    print(authProvider.userId);
+                                    final success =
+                                        await cartProvider.addToCart(
+                                      authProvider.userId!,
+                                      widget.product.id,
+                                    );
+                                    if (success) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                            content:
+                                                Text('Đã thêm vào giỏ hàng')),
+                                      );
+                                    } else {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                            content: Text(
+                                                cartProvider.errorMessage)),
+                                      );
+                                    }
+                                  }
+                                } else {
+                                  // Đã đăng nhập, gọi API để thêm vào giỏ hàng
+                                  final success = await cartProvider.addToCart(
+                                    authProvider.userId!,
+                                    widget.product.id,
+                                  );
+                                  if (success) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                          content:
+                                              Text('Đã thêm vào giỏ hàng')),
+                                    );
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                          content:
+                                              Text(cartProvider.errorMessage)),
+                                    );
+                                  }
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.blueAccent,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 32, vertical: 12),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              child: const Text(
+                                'Thêm vào giỏ hàng',
+                                style: TextStyle(
+                                    fontSize: 16, color: Colors.white),
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
                 ],
               ),
             ),
