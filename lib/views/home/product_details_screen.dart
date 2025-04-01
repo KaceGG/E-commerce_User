@@ -212,7 +212,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                       authProvider.userId!,
                                       widget.product.id,
                                     );
-                                    if (success) {
+                                    if (success && mounted) {
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(
                                         const SnackBar(
@@ -234,7 +234,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                     authProvider.userId!,
                                     widget.product.id,
                                   );
-                                  if (success) {
+                                  if (success && mounted) {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
                                           content:

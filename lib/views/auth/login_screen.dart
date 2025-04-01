@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:ecommerce_user/providers/auth_provider.dart';
 
@@ -60,13 +61,22 @@ class _LoginScreenState extends State<LoginScreen> {
                       final password = _passwordController.text;
                       final success =
                           await authProvider.login(username, password);
-                      if (success) {
-                        Navigator.pop(
-                            context); // Quay lại màn hình trước sau khi đăng nhập thành công
+                      if (success && mounted) {
+                        context.go('/');
                       }
                     },
                     child: const Text('Login'),
                   ),
+                const SizedBox(height: 16),
+                TextButton(
+                  onPressed: () {
+                    context.go('/register'); // Chuyển tới RegisterScreen
+                  },
+                  child: const Text(
+                    "Don't have an account? Register here",
+                    style: TextStyle(color: Colors.blueAccent),
+                  ),
+                ),
                 if (authProvider.errorMessage.isNotEmpty) ...[
                   const SizedBox(height: 16),
                   Text(
