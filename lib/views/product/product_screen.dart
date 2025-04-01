@@ -1,49 +1,56 @@
+import 'package:ecommerce_user/providers/category_provider.dart';
+import 'package:ecommerce_user/providers/product_provider.dart';
 import 'package:ecommerce_user/views/home/product_details_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:ecommerce_user/providers/product_provider.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class ProductScreen extends StatefulWidget {
+  const ProductScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<ProductScreen> createState() => _ProductScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-  bool _hasFetched = false; // Biến để kiểm tra xem đã gọi fetchProducts chưa
+class _ProductScreenState extends State<ProductScreen> {
+  String _selectedCategory = 'Tất cả';
+  bool _isInitialized = false;
 
   @override
   void initState() {
-    super.initState();
-    // Trì hoãn việc gọi fetchProducts cho đến sau khi build phase hoàn thành
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final provider = Provider.of<ProductProvider>(context, listen: false);
-      if (provider.products.isEmpty && !provider.isLoading && !_hasFetched) {
-        provider.fetchProducts();
-        setState(() {
-          _hasFetched = true; // Đánh dấu đã gọi fetchProducts
-        });
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      if (!_isInitialized) {
+        final categoryProvider =
+            Provider.of<CategoryProvider>(context, listen: false);
+        final productProvider =
+            Provider.of<ProductProvider>(context, listen: false);
+        categoryProvider.fetchCategories();
+        if (productProvider.products.isEmpty && !productProvider.isLoading) {
+          productProvider.fetchProducts();
+        }
+        _isInitialized = true;
       }
     });
+    super.initState();
   }
 
   Future<void> _refreshData() async {
     await Future.delayed(const Duration(seconds: 1));
     setState(() {
+      Provider.of<CategoryProvider>(context, listen: false).fetchCategories();
       Provider.of<ProductProvider>(context, listen: false).fetchProducts();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final numberFormat = NumberFormat('#,###', 'vi_VN');
+    final numberFormat = NumberFormat("#,###", "vi_VN");
 
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Trang chủ',
+          'Sản phẩm',
           style: TextStyle(
             fontWeight: FontWeight.bold,
             color: Colors.white,
@@ -59,34 +66,79 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Consumer<CategoryProvider>(
+                  builder: (context, categoryProvider, child) {
+                    final categories = ['Tất cả'] +
+                        categoryProvider.categories
+                            .map((cat) => cat.name)
+                            .toList();
+                    return SizedBox(
+                      width: double.infinity,
+                      child: DropdownButton<String>(
+                        isExpanded: true,
+                        value: _selectedCategory,
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedCategory = value!;
+                            final productProvider =
+                                Provider.of<ProductProvider>(context,
+                                    listen: false);
+                            if (_selectedCategory == 'Tất cả') {
+                              productProvider.fetchProducts();
+                            } else {
+                              final selectedCategory =
+                                  categoryProvider.categories.firstWhere(
+                                      (cat) => cat.name == _selectedCategory);
+                              productProvider
+                                  .fetchProductsByCategory(selectedCategory.id);
+                            }
+                          });
+                        },
+                        items: categories.map((category) {
+                          return DropdownMenuItem<String>(
+                            value: category,
+                            child: Text(category, style: GoogleFonts.poppins()),
+                          );
+                        }).toList(),
+                      ),
+                    );
+                  },
+                ),
+              ),
               Expanded(
                 child: Consumer<ProductProvider>(
-                  builder: (context, provider, child) {
-                    if (provider.isLoading) {
+                  builder: (context, productProvider, child) {
+                    if (productProvider.isLoading) {
                       return const Center(child: CircularProgressIndicator());
                     }
 
-                    if (provider.errorMessage.isNotEmpty) {
+                    if (productProvider.errorMessage.isNotEmpty) {
                       return Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              provider.errorMessage,
-                              style: const TextStyle(color: Colors.red),
+                              productProvider.errorMessage,
+                              style: GoogleFonts.poppins(color: Colors.red),
                             ),
                             const SizedBox(height: 20),
                             ElevatedButton(
-                              onPressed: () => provider.fetchProducts(),
-                              child: const Text('Retry'),
+                              onPressed: () => productProvider.fetchProducts(),
+                              child:
+                                  Text('Thử lại', style: GoogleFonts.poppins()),
                             ),
                           ],
                         ),
                       );
                     }
 
-                    if (provider.products.isEmpty) {
-                      return const Center(child: Text('No products available'));
+                    if (productProvider.products.isEmpty) {
+                      return Center(
+                        child: Text('Không có sản phẩm',
+                            style: GoogleFonts.poppins()),
+                      );
                     }
 
                     return GridView.builder(
@@ -98,17 +150,16 @@ class _HomeScreenState extends State<HomeScreen> {
                         mainAxisSpacing: 16.0,
                         childAspectRatio: 0.65,
                       ),
-                      itemCount: provider.products.length,
+                      itemCount: productProvider.products.length,
                       itemBuilder: (context, index) {
-                        final product = provider.products[index];
+                        final product = productProvider.products[index];
                         return GestureDetector(
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    ProductDetailScreen(product: product),
-                              ),
+                                  builder: (context) =>
+                                      ProductDetailScreen(product: product)),
                             );
                           },
                           child: Card(
@@ -160,7 +211,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     children: [
                                       Text(
                                         product.name,
-                                        style: const TextStyle(
+                                        style: GoogleFonts.poppins(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 16,
                                           color: Colors.black87,
@@ -171,7 +222,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       const SizedBox(height: 6),
                                       Text(
                                         '${numberFormat.format(product.price)} VNĐ',
-                                        style: const TextStyle(
+                                        style: GoogleFonts.poppins(
                                           color: Colors.redAccent,
                                           fontSize: 14,
                                           fontWeight: FontWeight.w600,

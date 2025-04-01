@@ -22,12 +22,11 @@ class ProductProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      print('call API');
       final response = await http.get(Uri.parse('$BASE_URL/getAll'));
 
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(utf8.decode(response.bodyBytes));
-        print('Response từ server: $jsonResponse');
+        // print('Response từ server: $jsonResponse');
         _products = (jsonResponse['result'] as List)
             .map((data) => Product.fromJson(data))
             .toList();
@@ -37,6 +36,31 @@ class ProductProvider extends ChangeNotifier {
       }
     } catch (error) {
       _errorMessage = 'An error occurred: $error';
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> fetchProductsByCategory(int categoryId) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final response =
+          await http.get(Uri.parse('$BASE_URL/category/$categoryId'));
+
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(utf8.decode(response.bodyBytes));
+        _products = (jsonResponse['result'] as List)
+            .map((data) => Product.fromJson(data))
+            .toList();
+        _errorMessage = '';
+      } else {
+        _errorMessage = 'Failed to load products';
+      }
+    } catch (e) {
+      _errorMessage = 'An error occurred: $e';
     } finally {
       _isLoading = false;
       notifyListeners();

@@ -1,3 +1,4 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:ecommerce_user/models/category_model.dart';
 import 'package:ecommerce_user/providers/auth_provider.dart';
 import 'package:ecommerce_user/providers/cart_provider.dart';
@@ -37,6 +38,50 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         });
       }
     });
+  }
+
+  void _showLoginDialog(BuildContext context) {
+    AwesomeDialog(
+      context: context,
+      dialogType: DialogType.info,
+      animType: AnimType.topSlide,
+      title: 'Thông báo',
+      desc: 'Vui lòng đăng nhập để tiếp tục',
+      btnOkText: 'Đăng nhập',
+      btnOkOnPress: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
+        ).then((result) {
+          if (result != null && mounted) {
+            // Kiểm tra lại sau khi đăng nhập
+            final authProvider =
+                Provider.of<AuthProvider>(context, listen: false);
+            if (authProvider.isLoggedIn) {
+              _addToCart(context);
+            }
+          }
+        });
+      },
+      btnCancelText: 'Hủy',
+      btnCancelOnPress: () {},
+    ).show();
+  }
+
+  Future<void> _addToCart(BuildContext context) async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final cartProvider = Provider.of<CartProvider>(context, listen: false);
+    final success =
+        await cartProvider.addToCart(authProvider.userId!, widget.product.id);
+    if (success && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Đã thêm vào giỏ hàng')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(cartProvider.errorMessage)),
+      );
+    }
   }
 
   @override
@@ -195,58 +240,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           return Center(
                             child: ElevatedButton(
                               onPressed: () async {
-                                if (!authProvider.isLoggedIn) {
-                                  // Chưa đăng nhập, điều hướng đến màn hình đăng nhập
-                                  final result = await Navigator.push(
+                                final authProvider = Provider.of<AuthProvider>(
                                     context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            const LoginScreen()),
-                                  );
-                                  // Nếu đăng nhập thành công, tiếp tục thêm vào giỏ hàng
-                                  if (result != null &&
-                                      authProvider.isLoggedIn) {
-                                    print(authProvider.userId);
-                                    final success =
-                                        await cartProvider.addToCart(
-                                      authProvider.userId!,
-                                      widget.product.id,
-                                    );
-                                    if (success && mounted) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                            content:
-                                                Text('Đã thêm vào giỏ hàng')),
-                                      );
-                                    } else {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        SnackBar(
-                                            content: Text(
-                                                cartProvider.errorMessage)),
-                                      );
-                                    }
-                                  }
+                                    listen: false);
+                                if (!authProvider.isLoggedIn) {
+                                  _showLoginDialog(context);
                                 } else {
-                                  // Đã đăng nhập, gọi API để thêm vào giỏ hàng
-                                  final success = await cartProvider.addToCart(
-                                    authProvider.userId!,
-                                    widget.product.id,
-                                  );
-                                  if (success && mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                          content:
-                                              Text('Đã thêm vào giỏ hàng')),
-                                    );
-                                  } else {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                          content:
-                                              Text(cartProvider.errorMessage)),
-                                    );
-                                  }
+                                  _addToCart(context);
                                 }
                               },
                               style: ElevatedButton.styleFrom(
