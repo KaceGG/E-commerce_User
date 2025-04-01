@@ -16,7 +16,44 @@ class AuthProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String get errorMessage => _errorMessage;
 
-  // Giả lập đăng nhập
+  set errorMessage(String message) {
+    _errorMessage = message;
+    notifyListeners();
+  }
+
+  Future<bool> register(String username, String password) async {
+    _isLoading = true;
+    _errorMessage = '';
+    notifyListeners();
+
+    try {
+      final response = await http.post(
+        Uri.parse('http://192.168.1.119:8080/user/create'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(
+          {'username': username, 'password': password},
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        _isLoading = false;
+        notifyListeners();
+        return true;
+      } else {
+        final data = jsonDecode(response.body);
+        _errorMessage = data['message'] ?? 'Registration failed';
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
+    } catch (e) {
+      _errorMessage = 'An error occurred: $e';
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
   Future<bool> login(String username, String password) async {
     _isLoading = true;
     notifyListeners();
@@ -61,12 +98,6 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  void logout() {
-    _userId = null;
-    _errorMessage = '';
-    notifyListeners();
-  }
-
   String? _getUserIdFromToken(String token) {
     try {
       // Tách token thành ba phần: header, payload, signature
@@ -89,5 +120,11 @@ class AuthProvider extends ChangeNotifier {
     } catch (e) {
       return null;
     }
+  }
+
+  void logout() {
+    _userId = null;
+    _errorMessage = '';
+    notifyListeners();
   }
 }
