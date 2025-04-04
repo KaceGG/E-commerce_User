@@ -10,7 +10,7 @@ class OrderHistoryScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           'Theo dõi đơn hàng',
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.roboto(
               fontWeight: FontWeight.bold, color: Colors.white),
         ),
         backgroundColor: Colors.blueAccent,
@@ -20,13 +20,13 @@ class OrderHistoryScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         children: [
           ListTile(
-            title: Text('Đơn hàng #1234', style: GoogleFonts.poppins()),
+            title: Text('Đơn hàng #1234', style: GoogleFonts.roboto()),
             subtitle:
-                Text('Trạng thái: Đang giao', style: GoogleFonts.poppins()),
+                Text('Trạng thái: Đang giao', style: GoogleFonts.roboto()),
           ),
           ListTile(
-            title: Text('Đơn hàng #5678', style: GoogleFonts.poppins()),
-            subtitle: Text('Trạng thái: Đã giao', style: GoogleFonts.poppins()),
+            title: Text('Đơn hàng #5678', style: GoogleFonts.roboto()),
+            subtitle: Text('Trạng thái: Đã giao', style: GoogleFonts.roboto()),
           ),
           // Thêm các đơn hàng khác nếu cần
         ],

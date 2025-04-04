@@ -6,6 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:url_launcher/url_launcher.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -78,6 +81,65 @@ class _CartScreenState extends State<CartScreen> {
     ).show();
   }
 
+  Future<void> _initiateZaloPayPayment(int amount, String userId) async {
+    const String zaloPayUrl =
+        'http://192.168.1.119:8080/payment/zalopay/create-order';
+    try {
+      final cartProvider = Provider.of<CartProvider>(context, listen: false);
+      final cartItems = cartProvider.cart?.cartItems ?? [];
+
+      final List<Map<String, dynamic>> orderItems = cartItems.map((cartItem) {
+        return {
+          'productId': cartItem.productId,
+          'quantity': cartItem.quantity,
+          'price': cartItem.productPrice,
+        };
+      }).toList();
+
+      final response = await http.post(
+        Uri.parse(zaloPayUrl),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'userId': userId,
+          'amount': amount,
+          'shippingAddress': 'Default Address',
+          'items': orderItems,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        final orderUrl = jsonResponse['result']['orderUrl'];
+        if (orderUrl != null) {
+          final Uri url = Uri.parse(orderUrl);
+          if (await canLaunchUrl(url)) {
+            await launchUrl(url, mode: LaunchMode.externalApplication);
+            // Sau khi thanh toán thành công, làm mới giỏ hàng
+            cartProvider.fetchCart(userId);
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Không thể mở ZaloPay')),
+            );
+          }
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Không nhận được URL thanh toán')),
+          );
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text(
+                  'Thanh toán thất bại: ${response.statusCode} - ${response.body}')),
+        );
+      }
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Lỗi khi gọi ZaloPay: $error')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final numberFormat = NumberFormat('#,###', 'vi_VN');
@@ -144,94 +206,139 @@ class _CartScreenState extends State<CartScreen> {
               }
 
               return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
-                    child: GridView.builder(
+                    child: ListView.builder(
                       padding: const EdgeInsets.all(16.0),
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 16.0,
-                        mainAxisSpacing: 16.0,
-                        childAspectRatio: 0.65,
-                      ),
                       itemCount: cartProvider.cart!.cartItems.length,
                       itemBuilder: (context, index) {
                         final cartItem = cartProvider.cart!.cartItems[index];
                         return Card(
                           elevation: 5,
+                          margin: const EdgeInsets.symmetric(vertical: 8.0),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(15),
                           ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              ClipRRect(
-                                borderRadius: const BorderRadius.vertical(
-                                    top: Radius.circular(15)),
-                                child: Image.network(
-                                  cartItem.productImageUrl,
-                                  height: 150,
-                                  width: double.infinity,
-                                  fit: BoxFit.contain,
-                                  loadingBuilder:
-                                      (context, child, loadingProgress) {
-                                    if (loadingProgress == null) return child;
-                                    return Container(
-                                      height: 150,
-                                      color: Colors.grey[200],
-                                      child: const Center(
-                                          child: CircularProgressIndicator()),
-                                    );
-                                  },
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Container(
-                                      height: 150,
-                                      color: Colors.grey[200],
-                                      child: const Icon(
-                                        Icons.image_not_supported,
-                                        size: 50,
-                                        color: Colors.grey,
+                          child: Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: Image.network(
+                                    cartItem.productImageUrl,
+                                    width: 100,
+                                    height: 100,
+                                    fit: BoxFit.contain,
+                                    loadingBuilder:
+                                        (context, child, loadingProgress) {
+                                      if (loadingProgress == null) return child;
+                                      return Container(
+                                        width: 100,
+                                        height: 100,
+                                        color: Colors.grey[200],
+                                        child: const Center(
+                                            child: CircularProgressIndicator()),
+                                      );
+                                    },
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Container(
+                                        width: 100,
+                                        height: 100,
+                                        color: Colors.grey[200],
+                                        child: const Icon(
+                                          Icons.image_not_supported,
+                                          size: 50,
+                                          color: Colors.grey,
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        cartItem.productName,
+                                        style: GoogleFonts.poppins(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                          color: Colors.black87,
+                                        ),
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
                                       ),
+                                      const SizedBox(height: 6),
+                                      Text(
+                                        '${numberFormat.format(cartItem.productPrice)} VNĐ',
+                                        style: GoogleFonts.poppins(
+                                          color: Colors.redAccent,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 6),
+                                      Row(
+                                        children: [
+                                          IconButton(
+                                            onPressed: () {
+                                              if (cartItem.quantity > 1) {
+                                                cartProvider.updateQuantity(
+                                                  authProvider.userId!,
+                                                  cartItem.id,
+                                                  cartItem.quantity - 1,
+                                                );
+                                              } else {
+                                                // Xóa sản phẩm nếu số lượng về 0
+                                                cartProvider.removeFromCart(
+                                                  authProvider.userId!,
+                                                  cartItem.id,
+                                                );
+                                              }
+                                            },
+                                            icon: const Icon(
+                                                Icons.remove_circle_outline),
+                                            color: Colors.blueAccent,
+                                          ),
+                                          Text(
+                                            '${cartItem.quantity}',
+                                            style: GoogleFonts.poppins(
+                                                fontSize: 14),
+                                          ),
+                                          IconButton(
+                                            onPressed: () {
+                                              cartProvider.updateQuantity(
+                                                authProvider.userId!,
+                                                cartItem.id,
+                                                cartItem.quantity + 1,
+                                              );
+                                            },
+                                            icon: const Icon(
+                                                Icons.add_circle_outline),
+                                            color: Colors.blueAccent,
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.delete,
+                                      color: Colors.red),
+                                  onPressed: () {
+                                    // Xóa sản phẩm khỏi giỏ hàng
+                                    cartProvider.removeFromCart(
+                                      authProvider.userId!,
+                                      cartItem.id,
                                     );
                                   },
                                 ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(12.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      cartItem.productName,
-                                      style: GoogleFonts.poppins(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16,
-                                        color: Colors.black87,
-                                      ),
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    const SizedBox(height: 6),
-                                    Text(
-                                      '${numberFormat.format(cartItem.productPrice)} VNĐ',
-                                      style: GoogleFonts.poppins(
-                                        color: Colors.redAccent,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 6),
-                                    Text(
-                                      'Số lượng: ${cartItem.quantity}',
-                                      style: GoogleFonts.poppins(fontSize: 14),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         );
                       },
@@ -239,22 +346,61 @@ class _CartScreenState extends State<CartScreen> {
                   ),
                   Padding(
                     padding: const EdgeInsets.all(16.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    child: Column(
                       children: [
-                        Text(
-                          'Tổng tiền:',
-                          style: GoogleFonts.poppins(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Tổng tiền:',
+                              style: GoogleFonts.poppins(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              '${numberFormat.format(cartProvider.cart!.totalPrice)} VNĐ',
+                              style: GoogleFonts.poppins(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.redAccent,
+                              ),
+                            ),
+                          ],
                         ),
-                        Text(
-                          '${numberFormat.format(cartProvider.cart!.totalPrice)} VNĐ',
-                          style: GoogleFonts.poppins(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.redAccent,
+                        const SizedBox(height: 16),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              if (authProvider.userId != null) {
+                                _initiateZaloPayPayment(
+                                  cartProvider.cart!.totalPrice.toInt(),
+                                  authProvider.userId!,
+                                );
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text(
+                                          'Vui lòng đăng nhập để thanh toán')),
+                                );
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blueAccent,
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            child: Text(
+                              'Thanh toán',
+                              style: GoogleFonts.poppins(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
                           ),
                         ),
                       ],
