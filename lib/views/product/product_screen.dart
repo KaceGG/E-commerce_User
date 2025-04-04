@@ -99,7 +99,7 @@ class _ProductScreenState extends State<ProductScreen> {
                         items: categories.map((category) {
                           return DropdownMenuItem<String>(
                             value: category,
-                            child: Text(category, style: GoogleFonts.poppins()),
+                            child: Text(category, style: GoogleFonts.roboto()),
                           );
                         }).toList(),
                       ),
@@ -121,13 +121,13 @@ class _ProductScreenState extends State<ProductScreen> {
                           children: [
                             Text(
                               productProvider.errorMessage,
-                              style: GoogleFonts.poppins(color: Colors.red),
+                              style: GoogleFonts.roboto(color: Colors.red),
                             ),
                             const SizedBox(height: 20),
                             ElevatedButton(
                               onPressed: () => productProvider.fetchProducts(),
                               child:
-                                  Text('Thử lại', style: GoogleFonts.poppins()),
+                                  Text('Thử lại', style: GoogleFonts.roboto()),
                             ),
                           ],
                         ),
@@ -137,7 +137,7 @@ class _ProductScreenState extends State<ProductScreen> {
                     if (productProvider.products.isEmpty) {
                       return Center(
                         child: Text('Không có sản phẩm',
-                            style: GoogleFonts.poppins()),
+                            style: GoogleFonts.roboto()),
                       );
                     }
 
@@ -211,7 +211,7 @@ class _ProductScreenState extends State<ProductScreen> {
                                     children: [
                                       Text(
                                         product.name,
-                                        style: GoogleFonts.poppins(
+                                        style: GoogleFonts.roboto(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 16,
                                           color: Colors.black87,
@@ -222,7 +222,7 @@ class _ProductScreenState extends State<ProductScreen> {
                                       const SizedBox(height: 6),
                                       Text(
                                         '${numberFormat.format(product.price)} VNĐ',
-                                        style: GoogleFonts.poppins(
+                                        style: GoogleFonts.roboto(
                                           color: Colors.redAccent,
                                           fontSize: 14,
                                           fontWeight: FontWeight.w600,

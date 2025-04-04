@@ -1,7 +1,7 @@
 import 'package:ecommerce_user/providers/auth_provider.dart';
 import 'package:ecommerce_user/views/auth/register_screen.dart';
+import 'package:ecommerce_user/views/main_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
@@ -92,7 +92,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                 final success = await authProvider.login(
                                     username, password);
                                 if (success && mounted) {
-                                  context.go('/home');
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const MainScreen()));
                                 }
                               },
                               style: ElevatedButton.styleFrom(

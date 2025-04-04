@@ -1,6 +1,7 @@
 import 'package:ecommerce_user/providers/auth_provider.dart';
 import 'package:ecommerce_user/providers/cart_provider.dart';
 import 'package:ecommerce_user/providers/category_provider.dart';
+import 'package:ecommerce_user/providers/order_provider.dart';
 import 'package:ecommerce_user/providers/product_provider.dart';
 import 'package:ecommerce_user/routes/app_router.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +18,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => ProductProvider()),
         ChangeNotifierProvider(create: (context) => CartProvider()),
         ChangeNotifierProvider(create: (context) => AuthProvider()),
+        ChangeNotifierProvider(create: (context) => OrderProvider()),
       ],
       child: MaterialApp.router(
         routerConfig: AppRouter.router,

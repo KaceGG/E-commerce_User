@@ -33,7 +33,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       appBar: AppBar(
         title: Text(
           'Đăng Ký',
-          style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.bold),
+          style: GoogleFonts.roboto(fontSize: 20, fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.blueAccent,
         elevation: 0,
@@ -61,7 +61,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   children: [
                     Text(
                       'Tạo tài khoản mới',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.roboto(
                         fontSize: 24,
                         fontWeight: FontWeight.w600,
                         color: Colors.blueAccent,
@@ -72,7 +72,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       controller: _usernameController,
                       decoration: InputDecoration(
                         labelText: 'Username',
-                        labelStyle: GoogleFonts.poppins(),
+                        labelStyle: GoogleFonts.roboto(),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -84,7 +84,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       obscureText: true,
                       decoration: InputDecoration(
                         labelText: 'Mật khẩu',
-                        labelStyle: GoogleFonts.poppins(),
+                        labelStyle: GoogleFonts.roboto(),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -96,7 +96,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       obscureText: true,
                       decoration: InputDecoration(
                         labelText: 'Xác nhận mật khẩu',
-                        labelStyle: GoogleFonts.poppins(),
+                        labelStyle: GoogleFonts.roboto(),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -137,7 +137,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                         child: Text(
                           'Đăng Ký',
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.roboto(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
@@ -148,7 +148,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       const SizedBox(height: 16),
                       Text(
                         authProvider.errorMessage,
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.roboto(
                           color: Colors.red,
                           fontSize: 14,
                         ),

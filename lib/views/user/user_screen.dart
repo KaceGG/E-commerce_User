@@ -1,6 +1,6 @@
 import 'package:ecommerce_user/providers/auth_provider.dart';
 import 'package:ecommerce_user/views/cart/cart_screen.dart';
-import 'package:ecommerce_user/views/order/order_history_screen.dart';
+import 'package:ecommerce_user/views/order/order_screen.dart';
 import 'package:ecommerce_user/views/user/change_password_screen.dart';
 import 'package:ecommerce_user/views/user/update_profile_screen.dart';
 import 'package:flutter/material.dart';
@@ -68,7 +68,7 @@ class _UserScreenState extends State<UserScreen> {
                   context,
                   Icons.history,
                   'Theo dõi đơn hàng',
-                  const OrderHistoryScreen(),
+                  const OrderScreen(),
                 ),
                 _buildSectionTitle('Đăng xuất'),
                 _buildListTile(
