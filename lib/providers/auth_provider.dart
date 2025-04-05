@@ -3,9 +3,10 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:ecommerce_user/core/utils/constant.dart' as constant;
 
 class AuthProvider extends ChangeNotifier {
-  static const String BASE_URL = 'http://192.168.1.119:8080/auth';
+  static const String BASE_URL = '${constant.BASE_URL}/auth';
 
   String? _userId; // Lưu userId sau khi đăng nhập
   bool _isLoading = false;

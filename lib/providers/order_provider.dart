@@ -4,9 +4,9 @@ import 'dart:convert';
 import 'package:ecommerce_user/models/order_model.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:ecommerce_user/core/utils/constant.dart' as constant;
 
 class OrderProvider extends ChangeNotifier {
-  static const String BASE_URL = 'http://192.168.1.119:8080';
   List<Order> _orders = [];
   bool _isLoading = false;
   String _errorMessage = '';
@@ -22,7 +22,7 @@ class OrderProvider extends ChangeNotifier {
 
     try {
       final response = await http.get(
-        Uri.parse('$BASE_URL/order?userId=$userId'),
+        Uri.parse('${constant.BASE_URL}/order?userId=$userId'),
       );
 
       print('Response status: ${response.statusCode}');

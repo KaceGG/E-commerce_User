@@ -4,9 +4,10 @@ import 'dart:convert';
 import 'package:ecommerce_user/models/cart_model.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:ecommerce_user/core/utils/constant.dart' as constant;
 
 class CartProvider extends ChangeNotifier {
-  static const String BASE_URL = 'http://192.168.1.119:8080/cart';
+  static const String BASE_URL = '${constant.BASE_URL}/cart';
   Cart? _cart;
   bool _isLoading = false;
   String _errorMessage = '';
