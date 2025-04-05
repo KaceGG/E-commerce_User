@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:ecommerce_user/core/utils/constant.dart' as constant;
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -83,7 +84,7 @@ class _CartScreenState extends State<CartScreen> {
 
   Future<void> _initiateZaloPayPayment(int amount, String userId) async {
     const String zaloPayUrl =
-        'http://192.168.1.119:8080/payment/zalopay/create-order';
+        '${constant.BASE_URL}/payment/zalopay/create-order';
     try {
       final cartProvider = Provider.of<CartProvider>(context, listen: false);
       final cartItems = cartProvider.cart?.cartItems ?? [];

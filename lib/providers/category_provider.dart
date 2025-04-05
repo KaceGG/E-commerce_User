@@ -6,10 +6,11 @@ import 'package:ecommerce_user/DTO/response/api_response.dart';
 import 'package:ecommerce_user/models/category_model.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:ecommerce_user/core/utils/constant.dart' as constant;
 
 class CategoryProvider extends ChangeNotifier {
   // ignore: constant_identifier_names
-  static const String BASE_URL = 'http://192.168.1.119:8080/category';
+  static const String BASE_URL = '${constant.BASE_URL}/category';
 
   List<Category> _categories = [];
   bool _isLoading = false;

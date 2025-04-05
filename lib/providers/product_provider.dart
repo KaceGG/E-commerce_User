@@ -4,10 +4,11 @@ import 'dart:convert';
 import 'package:ecommerce_user/models/product_model.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:ecommerce_user/core/utils/constant.dart' as constant;
 
 class ProductProvider extends ChangeNotifier {
   // ignore: constant_identifier_names
-  static const String BASE_URL = 'http://192.168.1.119:8080/product';
+  static const String BASE_URL = '${constant.BASE_URL}/product';
 
   List<Product> _products = [];
   bool _isLoading = false;

@@ -92,7 +92,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 final success = await authProvider.login(
                                     username, password);
                                 if (success && mounted) {
-                                  Navigator.push(
+                                  Navigator.pushReplacement(
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) =>
