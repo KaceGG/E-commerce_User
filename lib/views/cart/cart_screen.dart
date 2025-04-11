@@ -149,7 +149,7 @@ class _CartScreenState extends State<CartScreen> {
       appBar: AppBar(
         title: Text(
           'Giỏ hàng',
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.roboto(
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
@@ -167,7 +167,7 @@ class _CartScreenState extends State<CartScreen> {
                 return Center(
                   child: Text(
                     'Vui lòng đăng nhập để xem giỏ hàng',
-                    style: GoogleFonts.poppins(fontSize: 16),
+                    style: GoogleFonts.roboto(fontSize: 16),
                   ),
                 );
               }
@@ -183,13 +183,13 @@ class _CartScreenState extends State<CartScreen> {
                     children: [
                       Text(
                         cartProvider.errorMessage,
-                        style: GoogleFonts.poppins(color: Colors.red),
+                        style: GoogleFonts.roboto(color: Colors.red),
                       ),
                       const SizedBox(height: 20),
                       ElevatedButton(
                         onPressed: () =>
                             cartProvider.fetchCart(authProvider.userId!),
-                        child: Text('Thử lại', style: GoogleFonts.poppins()),
+                        child: Text('Thử lại', style: GoogleFonts.roboto()),
                       ),
                     ],
                   ),
@@ -201,7 +201,7 @@ class _CartScreenState extends State<CartScreen> {
                 return Center(
                   child: Text(
                     'Giỏ hàng trống',
-                    style: GoogleFonts.poppins(fontSize: 16),
+                    style: GoogleFonts.roboto(fontSize: 16),
                   ),
                 );
               }
@@ -265,7 +265,7 @@ class _CartScreenState extends State<CartScreen> {
                                     children: [
                                       Text(
                                         cartItem.productName,
-                                        style: GoogleFonts.poppins(
+                                        style: GoogleFonts.roboto(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 16,
                                           color: Colors.black87,
@@ -276,7 +276,7 @@ class _CartScreenState extends State<CartScreen> {
                                       const SizedBox(height: 6),
                                       Text(
                                         '${numberFormat.format(cartItem.productPrice)} VNĐ',
-                                        style: GoogleFonts.poppins(
+                                        style: GoogleFonts.roboto(
                                           color: Colors.redAccent,
                                           fontSize: 14,
                                           fontWeight: FontWeight.w600,
@@ -307,7 +307,7 @@ class _CartScreenState extends State<CartScreen> {
                                           ),
                                           Text(
                                             '${cartItem.quantity}',
-                                            style: GoogleFonts.poppins(
+                                            style: GoogleFonts.roboto(
                                                 fontSize: 14),
                                           ),
                                           IconButton(
@@ -354,14 +354,14 @@ class _CartScreenState extends State<CartScreen> {
                           children: [
                             Text(
                               'Tổng tiền:',
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.roboto(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             Text(
                               '${numberFormat.format(cartProvider.cart!.totalPrice)} VNĐ',
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.roboto(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.redAccent,
@@ -396,7 +396,7 @@ class _CartScreenState extends State<CartScreen> {
                             ),
                             child: Text(
                               'Thanh toán',
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.roboto(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,

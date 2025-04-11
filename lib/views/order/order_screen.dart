@@ -131,8 +131,9 @@ class _OrderScreenState extends State<OrderScreen> {
                                       fit: BoxFit.contain,
                                       loadingBuilder:
                                           (context, child, loadingProgress) {
-                                        if (loadingProgress == null)
+                                        if (loadingProgress == null) {
                                           return child;
+                                        }
                                         return Container(
                                           width: 60,
                                           height: 60,
@@ -182,34 +183,6 @@ class _OrderScreenState extends State<OrderScreen> {
                               ),
                             )),
                       ],
-                      // if (order.payment != null) ...[
-                      //   const SizedBox(height: 8),
-                      //   Text(
-                      //     'Thanh toán:',
-                      //     style:
-                      //         GoogleFonts.roboto(fontWeight: FontWeight.bold),
-                      //   ),
-                      //   if (order.payment!.orderToken != null)
-                      //     Text(
-                      //       'Order Token: ${order.payment!.orderToken}',
-                      //       style: GoogleFonts.roboto(),
-                      //     ),
-                      //   if (order.payment!.amount != null)
-                      //     Text(
-                      //       'Số tiền: ${numberFormat.format(order.payment!.amount!)} VNĐ',
-                      //       style: GoogleFonts.roboto(),
-                      //     ),
-                      //   if (order.payment!.status != null)
-                      //     Text(
-                      //       'Trạng thái: ${order.payment!.status}',
-                      //       style: GoogleFonts.roboto(),
-                      //     ),
-                      //   if (order.payment!.paymentDate != null)
-                      //     Text(
-                      //       'Ngày thanh toán: ${DateFormat('dd/MM/yyyy HH:mm').format(order.payment!.paymentDate!)}',
-                      //       style: GoogleFonts.roboto(),
-                      //     ),
-                      // ],
                     ],
                   ),
                 ),

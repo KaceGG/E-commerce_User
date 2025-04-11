@@ -1,8 +1,7 @@
 import 'package:ecommerce_user/providers/auth_provider.dart';
-import 'package:ecommerce_user/views/auth/register_screen.dart';
-import 'package:ecommerce_user/views/main_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -21,6 +20,47 @@ class _LoginScreenState extends State<LoginScreen> {
     _usernameController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  Future<void> _handleLogin(
+      BuildContext context, AuthProvider authProvider) async {
+    final username = _usernameController.text.trim();
+    final password = _passwordController.text.trim();
+
+    if (username.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Vui lòng nhập tên đăng nhập và mật khẩu',
+            style: GoogleFonts.roboto(),
+          ),
+        ),
+      );
+      return;
+    }
+
+    try {
+      final success = await authProvider.login(username, password);
+      if (success && mounted) {
+        // Đảm bảo điều hướng sau khi build hoàn tất
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            context.go('/'); // Chuyển hướng đến MainScreen
+          }
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Đăng nhập thất bại: $e',
+              style: GoogleFonts.roboto(),
+            ),
+          ),
+        );
+      }
+    }
   }
 
   @override
@@ -46,7 +86,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          // Logo or Title Section
                           Text(
                             'Xin chào!',
                             style: GoogleFonts.roboto(
@@ -56,7 +95,6 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
                           const SizedBox(height: 16),
-                          // Username field
                           TextFormField(
                             controller: _usernameController,
                             decoration: InputDecoration(
@@ -68,7 +106,6 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
                           const SizedBox(height: 16),
-                          // Password field
                           TextFormField(
                             controller: _passwordController,
                             obscureText: true,
@@ -81,24 +118,12 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
                           const SizedBox(height: 16),
-                          // Login Button
                           if (authProvider.isLoading)
                             const CircularProgressIndicator()
                           else
                             ElevatedButton(
-                              onPressed: () async {
-                                final username = _usernameController.text;
-                                final password = _passwordController.text;
-                                final success = await authProvider.login(
-                                    username, password);
-                                if (success && mounted) {
-                                  Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const MainScreen()));
-                                }
-                              },
+                              onPressed: () =>
+                                  _handleLogin(context, authProvider),
                               style: ElevatedButton.styleFrom(
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
@@ -110,21 +135,15 @@ class _LoginScreenState extends State<LoginScreen> {
                               child: const Text('Đăng nhập'),
                             ),
                           const SizedBox(height: 16),
-                          // Register Button
                           TextButton(
                             onPressed: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const RegisterScreen()));
+                              context.push('/register'); // Dùng go_router
                             },
                             child: const Text(
                               "Chưa có tài khoản? Đăng ký ngay",
                               style: TextStyle(color: Colors.blueAccent),
                             ),
                           ),
-                          // Error message
                           if (authProvider.errorMessage.isNotEmpty) ...[
                             const SizedBox(height: 16),
                             Text(

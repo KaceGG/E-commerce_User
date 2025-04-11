@@ -77,7 +77,13 @@ class _UserScreenState extends State<UserScreen> {
                   'Đăng xuất',
                   null,
                   color: Colors.red,
-                  onTap: () => context.go('/login'),
+                  onTap: () async {
+                    if (mounted) {
+                      await Provider.of<AuthProvider>(context, listen: false)
+                          .logout();
+                      context.go('/login');
+                    }
+                  },
                 ),
               ],
             ),

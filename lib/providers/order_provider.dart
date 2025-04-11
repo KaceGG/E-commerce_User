@@ -25,9 +25,6 @@ class OrderProvider extends ChangeNotifier {
         Uri.parse('${constant.BASE_URL}/order?userId=$userId'),
       );
 
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${utf8.decode(response.bodyBytes)}');
-
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(utf8.decode(response.bodyBytes));
         if (jsonResponse['code'] == 200 && jsonResponse['result'] != null) {
@@ -36,17 +33,16 @@ class OrderProvider extends ChangeNotifier {
               .toList();
           _errorMessage = '';
         } else {
-          _errorMessage =
-              jsonResponse['message'] ?? 'Failed to retrieve orders';
           _orders = [];
+          _errorMessage = '';
         }
       } else {
-        _errorMessage = 'Failed to load orders: ${response.statusCode}';
         _orders = [];
+        _errorMessage = 'Failed to load orders: ${response.statusCode}';
       }
     } catch (error) {
-      _errorMessage = 'An error occurred: $error';
       _orders = [];
+      _errorMessage = 'An error occurred: $error';
     } finally {
       _isLoading = false;
       notifyListeners();
