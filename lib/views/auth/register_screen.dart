@@ -123,7 +123,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             password,
                           );
                           if (success && mounted) {
-                            context.go('/login');
+                            // Hiển thị SnackBar
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'Đăng ký thành công!',
+                                  style: GoogleFonts.roboto(),
+                                ),
+                                backgroundColor: Colors.green,
+                                duration: const Duration(seconds: 2),
+                              ),
+                            );
+
+                            // Đợi 2 giây rồi chuyển hướng
+                            await Future.delayed(const Duration(seconds: 1));
+                            if (mounted) {
+                              context.go('/login');
+                            }
+                          } else {
+                            setState(() {}); // để hiển thị lỗi nếu có
                           }
                         },
                         style: ElevatedButton.styleFrom(

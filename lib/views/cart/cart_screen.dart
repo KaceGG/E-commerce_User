@@ -87,6 +87,7 @@ class _CartScreenState extends State<CartScreen> {
         '${constant.BASE_URL}/payment/zalopay/create-order';
     try {
       final cartProvider = Provider.of<CartProvider>(context, listen: false);
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
       final cartItems = cartProvider.cart?.cartItems ?? [];
 
       final List<Map<String, dynamic>> orderItems = cartItems.map((cartItem) {
@@ -97,13 +98,19 @@ class _CartScreenState extends State<CartScreen> {
         };
       }).toList();
 
+      // Kiểm tra địa chỉ người dùng, nếu null hoặc rỗng thì dùng "Default Address"
+      final shippingAddress = authProvider.user?.address != null &&
+              authProvider.user!.address.isNotEmpty
+          ? authProvider.user!.address
+          : 'Địa chỉ mặc định';
+
       final response = await http.post(
         Uri.parse(zaloPayUrl),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'userId': userId,
           'amount': amount,
-          'shippingAddress': 'Default Address',
+          'shippingAddress': shippingAddress,
           'items': orderItems,
         }),
       );
