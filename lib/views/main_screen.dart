@@ -1,8 +1,12 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
+import 'package:ecommerce_user/providers/auth_provider.dart';
 import 'package:ecommerce_user/views/home/home_screen.dart';
 import 'package:ecommerce_user/views/product/product_screen.dart';
 import 'package:ecommerce_user/views/user/user_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -20,7 +24,30 @@ class _MainScreenState extends State<MainScreen> {
     UserScreen(),
   ];
 
+  void _showLoginDialog(BuildContext context) {
+    AwesomeDialog(
+      context: context,
+      dialogType: DialogType.info,
+      animType: AnimType.topSlide,
+      title: 'Thông báo',
+      desc: 'Vui lòng đăng nhập để tiếp tục',
+      btnOkText: 'Đăng nhập',
+      btnOkOnPress: () {
+        context.go('/login');
+      },
+      btnCancelText: 'Hủy',
+      btnCancelOnPress: () {},
+    ).show();
+  }
+
   void _onItemTapped(int index) {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+    // Kiểm tra khi chọn tab "Người dùng" (index == 2)
+    if (index == 2 && !authProvider.isAuthenticated()) {
+      _showLoginDialog(context);
+      return;
+    }
     setState(() {
       _selectedIndex = index;
     });
