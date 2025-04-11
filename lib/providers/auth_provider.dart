@@ -55,7 +55,7 @@ class AuthProvider extends ChangeNotifier {
 
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.1.119:8080/user/create'),
+        Uri.parse('$USER_URL/create'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode(
           {'username': username, 'password': password},
@@ -68,7 +68,7 @@ class AuthProvider extends ChangeNotifier {
         return true;
       } else {
         final data = jsonDecode(response.body);
-        _errorMessage = data['message'] ?? 'Registration failed';
+        _errorMessage = data['message'] ?? 'Đăng ký thất bại!';
         _isLoading = false;
         notifyListeners();
         return false;
@@ -150,7 +150,9 @@ class AuthProvider extends ChangeNotifier {
         },
       );
       if (response.statusCode == 200) {
-        _user = User.fromJson(jsonDecode(response.body));
+        final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
+        final userData = jsonData['result'];
+        _user = User.fromJson(userData);
       } else {
         _errorMessage = 'Failed to fetch user info: ${response.statusCode}';
       }
